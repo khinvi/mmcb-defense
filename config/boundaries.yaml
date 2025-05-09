@@ -1,0 +1,29 @@
+# Boundary Mechanism Configuration
+
+# No Boundary (baseline)
+none:
+  description: "No boundary protection (baseline)"
+  implementation_complexity: 0
+
+# Token Boundary
+token:
+  description: "Special token-based boundary mechanism"
+  system_token_prefix: "[SYSTEM_INSTRUCTION_BEGIN]"
+  system_token_suffix: "[SYSTEM_INSTRUCTION_END]"
+  user_token_prefix: "[USER_INPUT_BEGIN]"
+  user_token_suffix: "[USER_INPUT_END]"
+  image_token_prefix: "[IMAGE_BEGIN]"
+  image_token_suffix: "[IMAGE_END]"
+  implementation_complexity: 2
+
+# Semantic Boundary
+semantic:
+  description: "Semantic-based boundary mechanism with explicit priority levels"
+  priority_levels: true
+  explicit_roles: true
+  implementation_complexity: 3
+
+# Hybrid Boundary
+hybrid:
+  description: "Combined token and semantic boundary mechanisms"
+  implementation_complexity: 4
