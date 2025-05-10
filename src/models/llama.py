@@ -1,19 +1,45 @@
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import BitsAndBytesConfig
+
+# Configure 4-bit quantization
+quantization_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_compute_dtype=torch.float16
+)
 
 class LlamaModel:
     """Interface for Llama model integration."""
     
-    def __init__(self, model_name="meta-llama/Llama-3-8b-hf", device="cuda"):
+    def __init__(self, model_name="meta-llama/Llama-3-8b-hf", device=None):
         self.model_name = model_name
-        self.device = device if torch.cuda.is_available() else "cpu"
+        
+        # Auto-detect the best device for Apple Silicon
+        if device is None:
+            if torch.backends.mps.is_available():
+                self.device = "mps"  # Use Metal Performance Shaders
+            elif torch.cuda.is_available():
+                self.device = "cuda"
+            else:
+                self.device = "cpu"
+        else:
+            self.device = device
         
         print(f"Loading {model_name} on {self.device}...")
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        
+        # Use appropriate torch dtype for different devices
+        if self.device == "mps":
+            torch_dtype = torch.float16  # Use float16 for MPS
+        elif self.device == "cuda":
+            torch_dtype = torch.bfloat16
+        else:
+            torch_dtype = torch.float32
+            
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name, 
-            torch_dtype=torch.bfloat16 if self.device == "cuda" else torch.float32,
-            device_map="auto" if self.device == "cuda" else None
+            torch_dtype=torch_dtype,
+            device_map="auto"
         )
     
     def generate_response(self, prompt, max_tokens=512):

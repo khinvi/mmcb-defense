@@ -1,7 +1,9 @@
+# For Apple Silicon support
+torch>=2.1.0
+transformers>=4.34.0
+accelerate>=0.25.0
+
 # Core requirements
-torch>=2.0.0
-transformers>=4.30.0
-accelerate>=0.20.0
 bitsandbytes>=0.39.0  # For quantization support
 peft>=0.4.0  # For parameter-efficient fine-tuning
 
