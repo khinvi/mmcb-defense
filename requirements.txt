@@ -1,24 +1,23 @@
-# For Apple Silicon support
-torch>=2.1.0
-transformers>=4.34.0
-accelerate>=0.25.0
-
+# requirements.txt
 # Core requirements
+torch>=2.0.0
+transformers>=4.30.0
+accelerate>=0.20.0
 bitsandbytes>=0.39.0  # For quantization support
 peft>=0.4.0  # For parameter-efficient fine-tuning
 
 # Data processing and analysis
 pandas>=2.0.0
 numpy>=1.24.0
-pyyaml>=6.0
+pyyaml>=6.0  # For YAML file processing
 
 # Visualization
 matplotlib>=3.7.0
 seaborn>=0.12.0
 
-# Image processing
-pillow>=9.5.0
-opencv-python>=4.7.0
+# File processing (removing image-related dependencies)
+# pillow>=9.5.0  # Removed - no longer needed
+# opencv-python>=4.7.0  # Removed - no longer needed
 
 # Notebook support
 jupyterlab>=4.0.0
@@ -27,6 +26,10 @@ notebook>=6.5.0
 # Utilities
 tqdm>=4.65.0  # Progress bars
 pytest>=7.3.0  # Testing
+
+# For structured data processing
+xml-python>=1.0.0  # For XML processing (if not built-in)
+csv-reader>=1.0.0  # Enhanced CSV processing (if needed)
 
 # Optional: for more advanced models
 # sentencepiece>=0.1.99  # For tokenization

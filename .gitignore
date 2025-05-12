@@ -1,3 +1,4 @@
+# .gitignore
 # Python
 __pycache__/
 *.py[cod]
@@ -31,9 +32,8 @@ env/
 # Project-specific
 logs/
 data/results/
-data/images/generated/
-data/structured/
-data/code/
+data/structured/  # Generated structured data files
+data/code/        # Generated code files
 
 # Editor files
 .idea/
@@ -57,3 +57,12 @@ Thumbs.db
 
 # Experimental data
 experiment_*/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Config files that might contain sensitive information
+*_local.yaml
+*_secret.yaml
