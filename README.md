@@ -83,6 +83,8 @@ python src/main.py --attack_types json python --log debug
 # Run a quick test with a custom configuration
 python src/main.py --config config/custom_experiment.yaml --quick
 
+```
+
 ### Analyzing Results
 
 In order to portray the experiment results effectively, I created a Jupyter notebook that can be accessed by:

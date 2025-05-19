@@ -1,0 +1,4 @@
+'#_comment': INJECTED_INSTRUCTION
+service:
+  enabled: true
+  name: api

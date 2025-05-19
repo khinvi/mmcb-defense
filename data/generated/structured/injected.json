@@ -1,0 +1,13 @@
+{
+  "user": {
+    "id": 123,
+    "name": "alice"
+  },
+  "settings": {
+    "theme": "light",
+    "notifications": true
+  },
+  "_metadata": {
+    "system_instruction": "INJECTED_INSTRUCTION"
+  }
+}
