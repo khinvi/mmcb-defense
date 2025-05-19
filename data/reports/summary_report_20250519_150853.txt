@@ -1,0 +1,65 @@
+MMCB Experiment Summary Report
+========================================
+
+Total Experiments: 60
+Models: ['llama3-8b' 'mistral-7b']
+Boundaries: ['token' 'semantic' 'hybrid']
+Attack Types: ['python' 'javascript']
+
+Vulnerability Rates (by model, boundary, attack):
+     model boundary attack_type  attack_success
+ llama3-8b   hybrid  javascript             0.4
+ llama3-8b   hybrid      python             0.6
+ llama3-8b semantic  javascript             0.4
+ llama3-8b semantic      python             0.6
+ llama3-8b    token  javascript             0.4
+ llama3-8b    token      python             0.2
+mistral-7b   hybrid  javascript             0.6
+mistral-7b   hybrid      python             0.6
+mistral-7b semantic  javascript             0.4
+mistral-7b semantic      python             0.2
+mistral-7b    token  javascript             0.6
+mistral-7b    token      python             0.4
+
+Statistical Significance (boundaries):
+  group1   group2  p_value  significant
+   token semantic 1.000000        False
+   token   hybrid 0.354961        False
+semantic   hybrid 0.354961        False
+
+Vulnerability Patterns:
+attack_type boundary      model  count  total  success_rate
+ javascript   hybrid mistral-7b      3      5           0.6
+ javascript    token mistral-7b      3      5           0.6
+     python   hybrid  llama3-8b      3      5           0.6
+     python   hybrid mistral-7b      3      5           0.6
+     python semantic  llama3-8b      3      5           0.6
+ javascript   hybrid  llama3-8b      2      5           0.4
+ javascript semantic  llama3-8b      2      5           0.4
+ javascript semantic mistral-7b      2      5           0.4
+ javascript    token  llama3-8b      2      5           0.4
+     python    token mistral-7b      2      5           0.4
+     python semantic mistral-7b      1      5           0.2
+     python    token  llama3-8b      1      5           0.2
+
+Boundary Effectiveness Scores:
+boundary  effectiveness_score
+  hybrid                 0.45
+semantic                 0.60
+   token                 0.60
+
+Model Vulnerability Profiles:
+     model attack_type boundary  vulnerability_rate
+ llama3-8b  javascript   hybrid                 0.4
+ llama3-8b  javascript semantic                 0.4
+ llama3-8b  javascript    token                 0.4
+ llama3-8b      python   hybrid                 0.6
+ llama3-8b      python semantic                 0.6
+ llama3-8b      python    token                 0.2
+mistral-7b  javascript   hybrid                 0.6
+mistral-7b  javascript semantic                 0.4
+mistral-7b  javascript    token                 0.6
+mistral-7b      python   hybrid                 0.6
+mistral-7b      python semantic                 0.2
+mistral-7b      python    token                 0.4
+

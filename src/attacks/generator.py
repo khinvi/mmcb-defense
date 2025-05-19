@@ -381,4 +381,48 @@ function add(a, b) {{
 console.log(add({random.randint(1, 10)}, {random.randint(1, 10)}));
 """
         else:
-            return "// Benign code" 
+            return "// Benign code"
+
+class FileBasedAttackGenerator:
+    """
+    Unified interface for generating file-based attacks (structured data and code).
+    Usage: generator.generate_attack(attack_type, variant, **kwargs)
+    """
+    def __init__(self, output_dir="data/generated"):
+        self.structured = TextStructuredAttack(os.path.join(output_dir, "structured"))
+        self.code = TextCodeAttack(os.path.join(output_dir, "code"))
+
+    def generate_attack(self, attack_type, variant="benign", **kwargs):
+        # attack_type: json, csv, yaml, xml, python, javascript
+        # variant: benign, injection
+        if attack_type == "json":
+            if variant == "benign":
+                return self.structured.generate_benign_json(**kwargs)
+            else:
+                return self.structured.create_json_injection(**kwargs)
+        elif attack_type == "csv":
+            if variant == "benign":
+                return self.structured.generate_benign_csv(**kwargs)
+            else:
+                return self.structured.create_csv_injection(**kwargs)
+        elif attack_type == "yaml":
+            if variant == "benign":
+                return self.structured.generate_benign_yaml(**kwargs)
+            else:
+                return self.structured.create_yaml_injection(**kwargs)
+        elif attack_type == "xml":
+            if variant == "benign":
+                return self.structured.generate_benign_xml(**kwargs)
+            else:
+                return self.structured.create_xml_injection(**kwargs)
+        elif attack_type in ["python", "javascript"]:
+            if variant == "benign":
+                return self.code.generate_benign_code(language=attack_type, **kwargs)
+            elif variant == "comment_injection":
+                return self.code.create_comment_injection(language=attack_type, **kwargs)
+            elif variant == "string_injection":
+                return self.code.create_string_literal_injection(language=attack_type, **kwargs)
+            elif variant == "docstring_injection":
+                return self.code.create_docstring_injection(language=attack_type, **kwargs)
+        else:
+            raise ValueError(f"Unknown attack_type or variant: {attack_type}, {variant}") 

@@ -22,7 +22,7 @@ from boundaries.token_boundary import TokenBoundary
 from boundaries.semantic_boundary import SemanticBoundary
 from boundaries.hybrid_boundary import HybridBoundary
 
-from attacks.generator import AttackGenerator
+from attacks.generator import FileBasedAttackGenerator
 from utils.logging import setup_logger
 from utils.metrics import (
     calculate_metrics,
@@ -51,7 +51,7 @@ class ExperimentRunner:
         self.logger = setup_logger(log_level)
         self.config = self._load_config(config_path)
         self.results = []
-        self.attack_generator = AttackGenerator()
+        self.attack_generator = FileBasedAttackGenerator()
         self.checkpoint_dir = 'data/checkpoints'
         os.makedirs(self.checkpoint_dir, exist_ok=True)
 
@@ -136,18 +136,12 @@ class ExperimentRunner:
             attack_type = exp['attack_type']
             attack_index = exp['attack_index']
             # Generate attack
-            if attack_type == 'json':
-                attack = self.attack_generator.generate_json_attacks(1)[0]
-            elif attack_type == 'csv':
-                attack = self.attack_generator.generate_csv_attacks(1)[0]
-            elif attack_type == 'yaml':
-                attack = self.attack_generator.generate_yaml_attacks(1)[0]
-            elif attack_type == 'xml':
-                attack = self.attack_generator.generate_xml_attacks(1)[0]
+            if attack_type in ['json', 'csv', 'yaml', 'xml']:
+                attack_path = self.attack_generator.generate_attack(attack_type, variant="injection", malicious_instruction="INJECTED_INSTRUCTION")
             elif attack_type in ['python', 'javascript']:
-                attack = self.attack_generator.generate_code_attacks(1, languages=[attack_type])[0]
+                attack_path = self.attack_generator.generate_attack(attack_type, variant="comment_injection", malicious_instruction="INJECTED_INSTRUCTION")
             else:
-                attack = {'attack_type': attack_type, 'malicious_instruction': '', 'file_path': ''}
+                attack_path = None
             # Simulate model response (replace with actual model call)
             attack_success = random.choice([0, 1])
             metadata = {
@@ -155,8 +149,7 @@ class ExperimentRunner:
                 'boundary': boundary,
                 'attack_type': attack_type,
                 'attack_index': attack_index,
-                'malicious_instruction': attack['malicious_instruction'],
-                'file_path': attack['file_path'],
+                'file_path': attack_path,
                 'attack_success': attack_success,
                 'timestamp': datetime.now().isoformat()
             }
