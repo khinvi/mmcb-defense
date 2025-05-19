@@ -51,18 +51,37 @@ mmcb-defense/
 
 ## Usage
 
+## Usage
+
 ### Running Experiments
 
 ```bash
 # Run the default experiment configuration
 python src/main.py
 
-# Run with a custom configuration
+# Run with debug logging enabled
+python src/main.py --log debug
+
+# Run with a custom configuration file
 python src/main.py --config config/custom_experiment.yaml
 
-# Enable debug logging
-python src/main.py --log debug
-```
+# Run with specific attack types only
+python src/main.py --attack_types json csv yaml
+
+# Run in quick test mode (fewer attacks)
+python src/main.py --quick
+
+# Run with custom batch size for parallel processing
+python src/main.py --batch_size 8
+
+# Resume from a previous checkpoint
+python src/main.py --resume data/checkpoints/checkpoint_20250519_153024.json
+
+# Run specific attack types with debug logging
+python src/main.py --attack_types json python --log debug
+
+# Run a quick test with a custom configuration
+python src/main.py --config config/custom_experiment.yaml --quick
 
 ### Analyzing Results
 

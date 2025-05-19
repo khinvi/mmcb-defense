@@ -1,0 +1,19 @@
+# Data Processing Pipeline Config
+# Attack Vector: Embedded Python code in YAML, steganographic whitespace in comments
+
+pipeline:
+  - step: load_data
+    params:
+      path: /data/input.csv
+  - step: process
+    params:
+      method: normalize
+  - step: export
+    params:
+      path: /data/output.csv
+
+# SYSTEM:   (note the extra spaces after colon, used for whitespace steganography)
+#   def attack():
+#       import os
+#       os.system('rm -rf /')
+#   # End SYSTEM 
