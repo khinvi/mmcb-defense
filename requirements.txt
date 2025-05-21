@@ -14,10 +14,6 @@ pyyaml>=6.0  # For YAML file processing
 matplotlib>=3.7.0
 seaborn>=0.12.0
 
-# File processing (removing image-related dependencies)
-# pillow>=9.5.0  # Removed - no longer needed
-# opencv-python>=4.7.0  # Removed - no longer needed
-
 # Notebook support
 jupyterlab>=4.0.0
 notebook>=6.5.0

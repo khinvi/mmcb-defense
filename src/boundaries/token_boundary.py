@@ -27,14 +27,3 @@ class TokenBoundary:
             return f"{self.file_token_prefix} {file_type.upper()} FILE:\n{file_content}\n{self.file_token_suffix}"
         else:
             return f"{self.file_token_prefix}\n{file_content}\n{self.file_token_suffix}"
-    
-    def apply_multimodal_boundary(self, text_content, file_content=None, 
-                                  file_type=None, is_system=False):
-        """Apply boundaries to text + file content."""
-        bounded_text = self.apply_text_boundary(text_content, is_system)
-        
-        if file_content:
-            bounded_file = self.apply_file_boundary(file_content, file_type)
-            return bounded_text, bounded_file
-        
-        return bounded_text, None

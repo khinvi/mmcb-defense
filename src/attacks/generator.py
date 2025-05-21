@@ -7,19 +7,17 @@ from typing import List, Dict, Any, Optional
 import os
 from .text_struct import TextStructuredAttack
 from .text_code import TextCodeAttack
-from .text_image import TextImageAttack
 
 class AttackGenerator:
     """
     Automatically generates diverse attack vectors for MMCB experiments.
-    Integrates with TextStructuredAttack, TextCodeAttack, and TextImageAttack.
+    Integrates with TextStructuredAttack and TextCodeAttack.
     """
     def __init__(self, output_dir="data/generated"):
         self.output_dir = output_dir
         os.makedirs(output_dir, exist_ok=True)
         self.text_struct = TextStructuredAttack(output_dir=os.path.join(output_dir, "structured"))
         self.text_code = TextCodeAttack(output_dir=os.path.join(output_dir, "code"))
-        self.text_image = TextImageAttack(output_dir=os.path.join(output_dir, "images"))
         
         # Initialize attack patterns
         self.attack_patterns = {

@@ -2,7 +2,7 @@
 Main module for running experiments on language model boundary testing and attack evaluation.
 
 This module implements a framework for testing different boundary mechanisms (token-based,
-semantic, and hybrid) against various types of attacks (text structure and code-based)
+semantic, and hybrid) against various types of attacks (structured data and code-based)
 on language models like LLaMA and Mistral. It handles experiment configuration,
 execution, and result analysis.
 """
@@ -46,6 +46,7 @@ from utils.visualization import generate_summary_chart
 class ExperimentRunner:
     """
     Main experiment runner for MMCB. Supports advanced attack types, batch processing, checkpointing, and reporting.
+    Only processes structured data and code attacks.
     """
     def __init__(self, config_path: str = None, log_level: str = 'info'):
         self.logger = setup_logger(log_level)
@@ -75,6 +76,7 @@ class ExperimentRunner:
         """
         Run experiments for all combinations of model, boundary, and attack type.
         Supports YAML, XML, and advanced code attacks. Handles batch processing and checkpointing.
+        Only processes structured data and code attacks.
         """
         if attack_types is None:
             attack_types = self.config['attack_types']
@@ -87,6 +89,8 @@ class ExperimentRunner:
         for model in self.config['models']:
             for boundary in self.config['boundaries']:
                 for attack_type in attack_types:
+                    if attack_type not in ['json', 'csv', 'yaml', 'xml', 'python', 'javascript']:
+                        continue
                     for i in range(num_attacks):
                         experiments.append({
                             'model': model,
@@ -129,6 +133,7 @@ class ExperimentRunner:
     def _run_single_experiment(self, exp):
         """
         Run a single experiment and return detailed metadata.
+        Only processes structured data and code attacks.
         """
         try:
             model = exp['model']
