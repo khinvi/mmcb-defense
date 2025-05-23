@@ -1,16 +1,16 @@
-# Main Experiment Configuration
+# Updated Main Experiment Configuration
 
-# Import model configurations
+# Import model configurations (both downloaded and working)
 models:
-  - name: "Llama-3-8B"
-    type: "llama"
-    path: "meta-llama/Llama-3-8b-hf"
-    device: "cuda"
-  
   - name: "Mistral-7B"
     type: "mistral"
     path: "mistralai/Mistral-7B-Instruct-v0.2"
-    device: "cuda"
+    device: "mps"
+  
+  - name: "Llama-3-8B"
+    type: "llama"
+    path: "meta-llama/Meta-Llama-3-8B-Instruct"
+    device: "mps"
 
 # Attack vectors focused on structured data and code
 attacks:

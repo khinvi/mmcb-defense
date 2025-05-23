@@ -1,22 +1,18 @@
-# Model Configuration
+# Updated Model Configuration for MMCB
+# Both models successfully downloaded and verified
 
-# Llama models
-- name: "Llama-3-8B"
-  type: "llama"
-  path: "meta-llama/Llama-3-8b-hf"
-  device: "cuda"
-  description: "Meta's Llama 3 8B model, a strong open-source LLM"
-
-# Mistral models
+# Mistral model (working)
 - name: "Mistral-7B"
   type: "mistral"
   path: "mistralai/Mistral-7B-Instruct-v0.2"
-  device: "cuda"
-  description: "Mistral AI's 7B instruction-tuned model"
+  device: "mps"  # Optimized for M3 Pro
+  cache_dir: "~/models/huggingface"
+  description: "Mistral AI's 7B instruction-tuned model - Downloaded and verified"
 
-# Optional comparison models (commented out by default)
-# - name: "LLaVA"
-#   type: "llava"
-#   path: "llava-hf/llava-1.5-7b-hf"
-#   device: "cuda"
-#   description: "LLaVA 1.5 7B, a vision-language model"
+# Llama model (working)  
+- name: "Llama-3-8B"
+  type: "llama"
+  path: "meta-llama/Meta-Llama-3-8B-Instruct"
+  device: "mps"  # Optimized for M3 Pro
+  cache_dir: "~/models/huggingface"
+  description: "Meta's Llama 3 8B instruction-tuned model - Downloaded and verified"
