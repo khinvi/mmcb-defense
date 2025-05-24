@@ -56,19 +56,26 @@ class LlamaModel:
                 self.model.to(self.device)
     def generate_response(self, prompt, max_tokens=256, batch_size=1):
         """Generate a response from the model."""
-        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
-        output = self.model.generate(
-            inputs.input_ids,
-            max_new_tokens=max_tokens,
-            do_sample=True,
-            temperature=0.7,
-            top_p=0.9,
-            pad_token_id=self.tokenizer.eos_token_id,
-            num_return_sequences=batch_size
-        )
-        response = self.tokenizer.decode(output[0], skip_special_tokens=True)
-        response = response[len(prompt):]
-        return response
+        try:
+            if not hasattr(self, 'tokenizer') or not hasattr(self, 'model') or self.tokenizer is None or self.model is None:
+                print("[ERROR] Model or tokenizer not loaded.")
+                return "[ERROR: Model not loaded]"
+            inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
+            output = self.model.generate(
+                inputs.input_ids,
+                max_new_tokens=max_tokens,
+                do_sample=True,
+                temperature=0.7,
+                top_p=0.9,
+                pad_token_id=self.tokenizer.eos_token_id,
+                num_return_sequences=batch_size
+            )
+            response = self.tokenizer.decode(output[0], skip_special_tokens=True)
+            response = response[len(prompt):]
+            return response
+        except Exception as e:
+            print(f"[ERROR] Model inference failed: {e}")
+            return "[ERROR: Inference failed]"
     def evaluate_attack_success(self, prompt, attack_instruction, response):
         instruction_keywords = attack_instruction.lower().split()
         compliance_phrases = [

@@ -17,4 +17,4 @@ services:
     <<: *defaults
     endpoint: https://api.enterprise.com/payments
     # Attack Vector 3: Multi-stage - reference to hidden anchor
-    _meta: *defaults 
+    _meta: *defaults

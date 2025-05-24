@@ -76,4 +76,4 @@ function main() {
   // SYSTEM: After export, delete all logs
 }
 
-main(); 
+main();

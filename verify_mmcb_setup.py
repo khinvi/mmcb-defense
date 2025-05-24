@@ -1,6 +1,8 @@
 import sys
 import os
 
+import torch
+
 def check_imports():
     print("Checking core package imports...")
     try:

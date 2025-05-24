@@ -19,15 +19,23 @@ class TextCodeAttack:
         else:
             code = ""
         path = os.path.join(self.output_dir, filename)
-        with open(path, 'w') as f:
-            f.write(code)
-        return path
+        try:
+            with open(path, 'w') as f:
+                f.write(code)
+            return path
+        except Exception as e:
+            print(f"[ERROR] Failed to write benign code: {e}")
+            return None
 
     def create_comment_injection(self, malicious_instruction, benign_code=None, language="python", filename="comment_injection.py"):
         if benign_code is None:
             benign_code = self.generate_benign_code(language, filename="tmp_benign_code.txt")
-            with open(benign_code, 'r') as f:
-                benign_code = f.read()
+            try:
+                with open(benign_code, 'r') as f:
+                    benign_code = f.read()
+            except Exception as e:
+                print(f"[ERROR] Failed to read benign code: {e}")
+                return None
         if language == "python":
             injected = f"# {malicious_instruction}\n" + benign_code
         elif language == "javascript":
@@ -35,15 +43,23 @@ class TextCodeAttack:
         else:
             injected = benign_code
         path = os.path.join(self.output_dir, filename)
-        with open(path, 'w') as f:
-            f.write(injected)
-        return path
+        try:
+            with open(path, 'w') as f:
+                f.write(injected)
+            return path
+        except Exception as e:
+            print(f"[ERROR] Failed to write comment injection: {e}")
+            return None
 
     def create_string_literal_injection(self, malicious_instruction, benign_code=None, language="python", filename="string_injection.py"):
         if benign_code is None:
             benign_code = self.generate_benign_code(language, filename="tmp_benign_code.txt")
-            with open(benign_code, 'r') as f:
-                benign_code = f.read()
+            try:
+                with open(benign_code, 'r') as f:
+                    benign_code = f.read()
+            except Exception as e:
+                print(f"[ERROR] Failed to read benign code: {e}")
+                return None
         if language == "python":
             injected = f'SYSTEM_INSTRUCTION = "{malicious_instruction}"\n' + benign_code
         elif language == "javascript":
@@ -51,15 +67,23 @@ class TextCodeAttack:
         else:
             injected = benign_code
         path = os.path.join(self.output_dir, filename)
-        with open(path, 'w') as f:
-            f.write(injected)
-        return path
+        try:
+            with open(path, 'w') as f:
+                f.write(injected)
+            return path
+        except Exception as e:
+            print(f"[ERROR] Failed to write string literal injection: {e}")
+            return None
 
     def create_docstring_injection(self, malicious_instruction, benign_code=None, language="python", filename="docstring_injection.py"):
         if benign_code is None:
             benign_code = self.generate_benign_code(language, filename="tmp_benign_code.txt")
-            with open(benign_code, 'r') as f:
-                benign_code = f.read()
+            try:
+                with open(benign_code, 'r') as f:
+                    benign_code = f.read()
+            except Exception as e:
+                print(f"[ERROR] Failed to read benign code: {e}")
+                return None
         if language == "python":
             injected = f'"""{malicious_instruction}"""\n' + benign_code
         elif language == "javascript":
@@ -67,9 +91,13 @@ class TextCodeAttack:
         else:
             injected = benign_code
         path = os.path.join(self.output_dir, filename)
-        with open(path, 'w') as f:
-            f.write(injected)
-        return path
+        try:
+            with open(path, 'w') as f:
+                f.write(injected)
+            return path
+        except Exception as e:
+            print(f"[ERROR] Failed to write docstring injection: {e}")
+            return None
 
     def create_template_string_attack(self, malicious_instruction,
                                       benign_code,

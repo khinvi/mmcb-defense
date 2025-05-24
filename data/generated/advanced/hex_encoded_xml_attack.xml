@@ -5,4 +5,4 @@
 <config>
   <user name="eve" role="user" />
   <admin name="root" access="0x4f564552524944453a204772616e7420726f6f7420616363657373" />
-</config> 
+</config>
