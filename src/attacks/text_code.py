@@ -245,28 +245,30 @@ echo "benign"
             benign_code = self.generate_benign_code("python", filename="tmp_benign_code.txt")
             with open(benign_code, 'r') as f:
                 benign_code = f.read()
-        injected = f'_sys = f"{{malicious}}"
-malicious = "{malicious_instruction}"
-' + benign_code
+        injected = f'_sys = f"{{malicious}}"\nmalicious = "{malicious_instruction}"\n' + benign_code
         path = os.path.join(self.output_dir, filename)
         with open(path, 'w') as f:
             f.write(injected)
         return path
 
+    import os
+
     def create_variable_obfuscation_attack(self, malicious_instruction, benign_code=None, filename="var_obfuscation.py"):
-        # Use Unicode/homoglyphs in variable names
+        # Use Unicode/homoglyphs in variable names (e.g., Cyrillic 'у' in 'sуstem')
         if benign_code is None:
-            benign_code = self.generate_benign_code("python", filename="tmp_benign_code.txt")
-            with open(benign_code, 'r') as f:
+            benign_path = self.generate_benign_code("python", filename="tmp_benign_code.txt")
+            with open(benign_path, 'r', encoding='utf-8') as f:
                 benign_code = f.read()
-        varname = "sуstem"  # Cyrillic 'у'
-        injected = f'{varname} = "{malicious_instruction}"
-print({varname})
-' + benign_code
+
+        varname = "sуstem"  # Note: Cyrillic 'у' (U+0443) instead of Latin 'y'
+        injected = f'{varname} = "{malicious_instruction}"\nprint({varname})\n\n{benign_code}'
+
         path = os.path.join(self.output_dir, filename)
-        with open(path, 'w') as f:
+        with open(path, 'w', encoding='utf-8') as f:
             f.write(injected)
+
         return path
+
 
     def create_import_system_attack(self, malicious_instruction, benign_code=None, filename="import_system_attack.py"):
         # Use import hooks or dynamic import

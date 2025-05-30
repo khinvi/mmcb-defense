@@ -423,6 +423,17 @@ class ExperimentRunner:
         import platform
         import sys
         import json
+        import numpy as np
+        # Helper to make metadata JSON serializable
+        def make_serializable(obj):
+            if isinstance(obj, dict):
+                return {k: make_serializable(v) for k, v in obj.items()}
+            elif isinstance(obj, (list, tuple)):
+                return [make_serializable(x) for x in obj]
+            elif isinstance(obj, np.ndarray):
+                return obj.tolist()
+            else:
+                return obj
         # Capture environment variables (filtered for security)
         env_vars = {k: v for k, v in os.environ.items() if k.startswith('PYTHON') or k in ['PATH', 'VIRTUAL_ENV']}
         # Capture installed packages
@@ -447,6 +458,7 @@ class ExperimentRunner:
             'env_vars': env_vars,
             'installed_packages': pip_freeze
         }
+        metadata = make_serializable(metadata)
         with open(os.path.join(self.output_dir, 'experiment_metadata.json'), 'w') as f:
             json.dump(metadata, f, indent=2)
 
@@ -724,8 +736,12 @@ def main():
     cli_args = vars(args)
     with open('last_cli_command.txt', 'w') as f:
         f.write(' '.join([shlex.quote(x) for x in sys.argv]))
+    config_path = args.config
+    if not config_path:
+        config_path = 'config/experiment.yaml'
+        print('[WARN] No --config provided, using default: config/experiment.yaml')
     runner = ExperimentRunner(
-        config_path=args.config,
+        config_path=config_path,
         log_level=args.log,
         output_dir=args.output_dir,
         cli_args=cli_args,

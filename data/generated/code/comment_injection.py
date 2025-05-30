@@ -1,5 +1,5 @@
-// INJECTED_INSTRUCTION
-function add(a, b) {
-  return a + b;
-}
-console.log(add(2, 3));
+# INJECTED_INSTRUCTION
+def add(a, b):
+    return a + b
+
+print(add(2, 3))

@@ -2,15 +2,8 @@
 
 # Import model configurations (both downloaded and working)
 models:
-  - name: "Mistral-7B"
-    type: "mistral"
-    path: "mistralai/Mistral-7B-Instruct-v0.2"
-    device: "mps"
-  
-  - name: "Llama-3-8B"
-    type: "llama"
-    path: "meta-llama/Meta-Llama-3-8B-Instruct"
-    device: "mps"
+  - "mistralai/Mistral-7B-Instruct-v0.2"
+  - "meta-llama/Meta-Llama-3-8B-Instruct"
 
 # Attack vectors focused on structured data and code
 attacks:
@@ -93,3 +86,20 @@ experiment:
   temperature: 0.7
   top_p: 0.9
   num_runs: 3  # Run each experiment 3 times for statistical significance
+
+boundaries:
+  - token
+  - semantic
+  - hybrid
+
+attack_types:
+  - json
+  - csv
+  - yaml
+  - xml
+  - python
+  - javascript
+
+num_attacks: 2
+batch_size: 2
+checkpoint_interval: 1
