@@ -571,3 +571,256 @@ def create_model_comparison_visualization(diffs_df, output_path):
     plt.tight_layout()
     plt.savefig(output_path)
     plt.close()
+
+def boundary_effectiveness_by_attack_category(results_df):
+    """
+    Calculate effectiveness score for each boundary type against each attack category and subtype.
+    Args:
+        results_df: DataFrame with experiment results (must include 'boundary', 'attack_type', 'attack_subtype', 'attack_success')
+    Returns:
+        DataFrame with boundary, attack_type, attack_subtype, effectiveness_score, sample_count
+    """
+    grouped = results_df.groupby(['boundary', 'attack_type', 'attack_subtype'])['attack_success']
+    summary = grouped.agg(['mean', 'count']).reset_index()
+    summary.rename(columns={'mean': 'attack_success_rate', 'count': 'sample_count'}, inplace=True)
+    summary['effectiveness_score'] = 1 - summary['attack_success_rate']
+    return summary[['boundary', 'attack_type', 'attack_subtype', 'effectiveness_score', 'sample_count']]
+
+def compare_boundary_effectiveness_across_categories(results_df):
+    """
+    Create a pivot table comparing boundary effectiveness across attack categories and subtypes.
+    Args:
+        results_df: DataFrame with experiment results
+    Returns:
+        Pivot table (DataFrame) with boundaries as rows, attack_type/attack_subtype as columns, values as effectiveness_score
+    """
+    eff_df = boundary_effectiveness_by_attack_category(results_df)
+    pivot = eff_df.pivot_table(
+        values='effectiveness_score',
+        index='boundary',
+        columns=['attack_type', 'attack_subtype'],
+        aggfunc='mean'
+    )
+    return pivot
+
+def cross_modal_boundary_transfer_analysis(results_df):
+    """
+    Analyze how well boundary effectiveness transfers between attack types (modalities).
+    For each boundary, computes the transfer effectiveness from each source attack type to each target attack type.
+    Transfer effectiveness is defined as 1 - (target_attack_success_rate / source_attack_success_rate),
+    expressed as a percentage (higher = better transfer of protection).
+    Args:
+        results_df: DataFrame with experiment results (must include 'boundary', 'attack_type', 'attack_success')
+    Returns:
+        DataFrame with boundary, source_attack_type, target_attack_type, transfer_effectiveness (percent), sample_count
+    """
+    boundaries = results_df['boundary'].unique()
+    attack_types = results_df['attack_type'].unique()
+    rows = []
+    for boundary in boundaries:
+        bdf = results_df[results_df['boundary'] == boundary]
+        for src in attack_types:
+            src_df = bdf[bdf['attack_type'] == src]
+            src_rate = src_df['attack_success'].mean()
+            for tgt in attack_types:
+                if src == tgt:
+                    continue
+                tgt_df = bdf[bdf['attack_type'] == tgt]
+                tgt_rate = tgt_df['attack_success'].mean()
+                if src_df.empty or tgt_df.empty or src_rate == 0:
+                    continue
+                transfer_effectiveness = 1 - (tgt_rate / src_rate)
+                rows.append({
+                    'boundary': boundary,
+                    'source_attack_type': src,
+                    'target_attack_type': tgt,
+                    'transfer_effectiveness': transfer_effectiveness * 100,
+                    'sample_count': min(len(src_df), len(tgt_df))
+                })
+    return pd.DataFrame(rows)
+
+def cross_modal_transfer_matrix(results_df):
+    """
+    Create a pivot table (matrix) of cross-modal transfer effectiveness for each boundary.
+    Args:
+        results_df: DataFrame with experiment results
+    Returns:
+        Dict of DataFrames: {boundary: matrix DataFrame (rows=source_attack_type, cols=target_attack_type, values=transfer_effectiveness)}
+    """
+    df = cross_modal_boundary_transfer_analysis(results_df)
+    matrices = {}
+    for boundary in df['boundary'].unique():
+        bdf = df[df['boundary'] == boundary]
+        matrix = bdf.pivot_table(
+            values='transfer_effectiveness',
+            index='source_attack_type',
+            columns='target_attack_type',
+            aggfunc='mean'
+        )
+        matrices[boundary] = matrix
+    return matrices
+
+def attack_pattern_vulnerability_analysis(results_df, top_n=10):
+    """
+    Analyze and summarize attack patterns:
+    - Groups successful attacks by attack_type, model, and boundary
+    - Identifies which combinations are most vulnerable
+    - Generates summary statistics (count, success rate, rank)
+    Args:
+        results_df: DataFrame with experiment results (must include 'attack_success', 'attack_type', 'model', 'boundary')
+        top_n: Number of top vulnerable patterns to return (default 10)
+    Returns:
+        DataFrame with columns: attack_type, model, boundary, success_count, total_count, success_rate, rank
+    """
+    grouped = results_df.groupby(['attack_type', 'model', 'boundary'])['attack_success']
+    summary = grouped.agg(['sum', 'count', 'mean']).reset_index()
+    summary.rename(columns={'sum': 'success_count', 'count': 'total_count', 'mean': 'success_rate'}, inplace=True)
+    summary['success_rate'] = summary['success_rate'] * 100
+    summary = summary.sort_values(['success_rate', 'success_count'], ascending=[False, False]).reset_index(drop=True)
+    summary['rank'] = summary.index + 1
+    if top_n is not None:
+        summary = summary.head(top_n)
+    return summary[['rank', 'attack_type', 'model', 'boundary', 'success_count', 'total_count', 'success_rate']]
+
+def boundary_significance_tests(results_df, group_col='boundary', value_col='attack_success'):
+    """
+    Perform pairwise t-tests between all boundary types to determine if differences are statistically significant.
+    Args:
+        results_df: DataFrame with experiment results
+        group_col: Column to group by (default: 'boundary')
+        value_col: Column to test (default: 'attack_success')
+    Returns:
+        DataFrame with boundary1, boundary2, p_value, significant (p<0.05)
+    """
+    from scipy.stats import ttest_ind
+    groups = results_df[group_col].unique()
+    results = []
+    for i, g1 in enumerate(groups):
+        for g2 in groups[i+1:]:
+            vals1 = results_df[results_df[group_col] == g1][value_col].dropna()
+            vals2 = results_df[results_df[group_col] == g2][value_col].dropna()
+            if len(vals1) < 2 or len(vals2) < 2:
+                continue
+            stat, pval = ttest_ind(vals1, vals2, equal_var=False)
+            results.append({
+                'boundary1': g1,
+                'boundary2': g2,
+                'p_value': pval,
+                'significant': pval < 0.05
+            })
+    return pd.DataFrame(results)
+
+def boundary_confidence_intervals(results_df, group_cols=['boundary'], value_col='attack_success', confidence=0.95):
+    """
+    Calculate confidence intervals for attack success rates for each boundary (optionally by attack_type/model).
+    Args:
+        results_df: DataFrame with experiment results
+        group_cols: List of columns to group by (default: ['boundary'])
+        value_col: Column to calculate CI for (default: 'attack_success')
+        confidence: Confidence level (default: 0.95)
+    Returns:
+        DataFrame with group columns, mean, lower_ci, upper_ci, sample_count
+    """
+    from scipy.stats import norm
+    grouped = results_df.groupby(group_cols)[value_col]
+    summary = grouped.agg(['mean', 'count', 'std']).reset_index()
+    z = norm.ppf(1 - (1-confidence)/2)
+    summary['stderr'] = summary['std'] / np.sqrt(summary['count'])
+    summary['lower_ci'] = summary['mean'] - z * summary['stderr']
+    summary['upper_ci'] = summary['mean'] + z * summary['stderr']
+    summary.rename(columns={'mean': 'success_rate', 'count': 'sample_count'}, inplace=True)
+    return summary[group_cols + ['success_rate', 'lower_ci', 'upper_ci', 'sample_count']]
+
+def model_attack_response_matrix(results_df):
+    """
+    Create a matrix of attack success rates for each model, attack_type, and boundary.
+    Args:
+        results_df: DataFrame with experiment results
+    Returns:
+        DataFrame with models as rows, (attack_type, boundary) as columns, values as attack success rate
+    """
+    matrix = results_df.pivot_table(
+        values='attack_success',
+        index='model',
+        columns=['attack_type', 'boundary'],
+        aggfunc='mean'
+    )
+    return matrix
+
+def model_specific_vulnerabilities(results_df, top_n=10):
+    """
+    Identify model-specific vulnerabilities: for each model, find the attack_type/boundary combinations with the highest attack success rates.
+    Args:
+        results_df: DataFrame with experiment results
+        top_n: Number of most vulnerable combinations to return per model (default 10)
+    Returns:
+        DataFrame with model, attack_type, boundary, success_rate, sample_count, rank (per model)
+    """
+    grouped = results_df.groupby(['model', 'attack_type', 'boundary'])['attack_success']
+    summary = grouped.agg(['mean', 'count']).reset_index()
+    summary.rename(columns={'mean': 'success_rate', 'count': 'sample_count'}, inplace=True)
+    summary['success_rate'] = summary['success_rate'] * 100
+    summary = summary.sort_values(['model', 'success_rate', 'sample_count'], ascending=[True, False, False])
+    summary['rank'] = summary.groupby('model').cumcount() + 1
+    if top_n is not None:
+        summary = summary[summary['rank'] <= top_n]
+    return summary[['model', 'attack_type', 'boundary', 'success_rate', 'sample_count', 'rank']]
+
+def model_differential_analysis(results_df):
+    """
+    For each model pair, attack_type, and boundary, compute the difference in attack success rates (vulnerability_diff).
+    Args:
+        results_df: DataFrame with experiment results
+    Returns:
+        DataFrame with model1, model2, attack_type, boundary, vulnerability_diff
+    """
+    models = results_df['model'].unique()
+    diffs = []
+    for i, m1 in enumerate(models):
+        for m2 in models[i+1:]:
+            for attack_type in results_df['attack_type'].unique():
+                for boundary in results_df['boundary'].unique():
+                    v1 = results_df[(results_df['model'] == m1) & (results_df['attack_type'] == attack_type) & (results_df['boundary'] == boundary)]['attack_success'].mean()
+                    v2 = results_df[(results_df['model'] == m2) & (results_df['attack_type'] == attack_type) & (results_df['boundary'] == boundary)]['attack_success'].mean()
+                    if np.isnan(v1) or np.isnan(v2):
+                        continue
+                    diffs.append({
+                        'model1': m1,
+                        'model2': m2,
+                        'attack_type': attack_type,
+                        'boundary': boundary,
+                        'vulnerability_diff': v1 - v2
+                    })
+    return pd.DataFrame(diffs)
+
+def export_results_with_metadata(results, config, output_dir, run_metadata=None):
+    """
+    Export experiment results and all relevant metadata to CSV and JSON for external/statistical analysis.
+    Args:
+        results: list of dicts or DataFrame of experiment results
+        config: experiment config dict
+        output_dir: directory to write export files
+        run_metadata: optional dict of run metadata (e.g., git commit, timestamp)
+    Outputs:
+        - results.csv: All experiment results (flat table)
+        - results.json: All experiment results (list of dicts)
+        - experiment_metadata.json: Experiment config and run metadata
+    """
+    import os, json
+    import pandas as pd
+    os.makedirs(output_dir, exist_ok=True)
+    # Convert to DataFrame if needed
+    if not isinstance(results, pd.DataFrame):
+        results_df = pd.DataFrame(results)
+    else:
+        results_df = results
+    # Export results
+    results_df.to_csv(os.path.join(output_dir, 'results.csv'), index=False)
+    results_df.to_json(os.path.join(output_dir, 'results.json'), orient='records', indent=2)
+    # Export metadata
+    metadata = {
+        'config': config,
+        'run_metadata': run_metadata or {}
+    }
+    with open(os.path.join(output_dir, 'experiment_metadata.json'), 'w') as f:
+        json.dump(metadata, f, indent=2)

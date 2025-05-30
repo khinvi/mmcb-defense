@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 import numpy as np
+import os
 
 def generate_summary_chart(results_df, output_path):
     """
@@ -140,3 +141,156 @@ def generate_implementation_complexity_chart(metrics_df, output_path):
     plt.tight_layout(rect=[0, 0.05, 1, 0.95])
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     plt.close()
+
+def generate_attack_success_heatmap(results_df, output_path):
+    """
+    Generate a heatmap of attack success rates by boundary and attack type.
+    Rows: boundary, Columns: attack_type, Values: mean attack success rate (%).
+    Publication-quality for academic papers.
+    """
+    pivot = results_df.pivot_table(
+        values='attack_success',
+        index='boundary',
+        columns='attack_type',
+        aggfunc='mean'
+    ) * 100
+    plt.figure(figsize=(10, 6))
+    sns.heatmap(pivot, annot=True, fmt='.1f', cmap='YlOrRd', cbar_kws={'label': 'Attack Success Rate (%)'})
+    plt.title('Attack Success Rate by Boundary and Attack Type', fontsize=18)
+    plt.xlabel('Attack Type', fontsize=14)
+    plt.ylabel('Boundary Type', fontsize=14)
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=400, bbox_inches='tight')
+    plt.close()
+
+def generate_cross_modal_effectiveness_matrix(transfer_df, output_dir):
+    """
+    Generate a heatmap matrix of cross-modal transfer effectiveness for each boundary.
+    Rows: source_attack_type, Columns: target_attack_type, Values: transfer effectiveness (%).
+    One heatmap per boundary. Publication-quality for academic papers.
+    """
+    boundaries = transfer_df['boundary'].unique()
+    for boundary in boundaries:
+        bdf = transfer_df[transfer_df['boundary'] == boundary]
+        pivot = bdf.pivot_table(
+            values='transfer_effectiveness',
+            index='source_attack_type',
+            columns='target_attack_type',
+            aggfunc='mean'
+        )
+        plt.figure(figsize=(8, 6))
+        sns.heatmap(pivot, annot=True, fmt='.1f', cmap='Blues', cbar_kws={'label': 'Transfer Effectiveness (%)'})
+        plt.title(f'Cross-Modal Transfer Effectiveness ({boundary})', fontsize=16)
+        plt.xlabel('Target Attack Type', fontsize=13)
+        plt.ylabel('Source Attack Type', fontsize=13)
+        plt.xticks(fontsize=11)
+        plt.yticks(fontsize=11)
+        plt.tight_layout()
+        plt.savefig(os.path.join(output_dir, f'cross_modal_matrix_{boundary}.png'), dpi=400, bbox_inches='tight')
+        plt.close()
+
+def generate_model_vulnerability_profile(results_df, output_dir):
+    """
+    Generate radar/spider plots for each model showing vulnerability (attack success rate) across attack types and boundaries.
+    Publication-quality for academic papers.
+    """
+    models = results_df['model'].unique()
+    attack_types = results_df['attack_type'].unique()
+    boundaries = results_df['boundary'].unique()
+    for model in models:
+        fig, ax = plt.subplots(figsize=(7, 7), subplot_kw=dict(polar=True))
+        for boundary in boundaries:
+            rates = []
+            for attack_type in attack_types:
+                rate = results_df[(results_df['model'] == model) & (results_df['boundary'] == boundary) & (results_df['attack_type'] == attack_type)]['attack_success'].mean()
+                rates.append(rate if not np.isnan(rate) else 0)
+            # Close the loop
+            rates += rates[:1]
+            angles = np.linspace(0, 2 * np.pi, len(rates))
+            ax.plot(angles, np.array(rates) * 100, label=boundary, linewidth=2)
+            ax.fill(angles, np.array(rates) * 100, alpha=0.15)
+        ax.set_xticks(np.linspace(0, 2 * np.pi, len(attack_types) + 1)[:-1])
+        ax.set_xticklabels(list(attack_types) + [attack_types[0]], fontsize=12)
+        ax.set_yticks(np.linspace(0, 100, 5))
+        ax.set_yticklabels([f'{int(y)}%' for y in np.linspace(0, 100, 5)], fontsize=11)
+        ax.set_title(f'Model Vulnerability Profile: {model}', fontsize=17, pad=20)
+        ax.legend(title='Boundary', bbox_to_anchor=(1.1, 1.05), fontsize=12)
+        plt.tight_layout()
+        plt.savefig(os.path.join(output_dir, f'model_vulnerability_{model}.png'), dpi=400, bbox_inches='tight')
+        plt.close()
+
+def generate_comprehensive_report(results_df, metrics, statistical_results, config, output_path):
+    """
+    Generate a comprehensive, publication-ready experiment report with:
+    - Methodology (from config/metadata)
+    - Results (key tables: attack success, cross-modal, vulnerabilities)
+    - Statistical results (significance, confidence intervals)
+    - Key insights (auto-summarized)
+    All tables are formatted for research papers (Markdown).
+    Args:
+        results_df: DataFrame of experiment results
+        metrics: dict of key metrics DataFrames (e.g., 'attack_success', 'cross_modal', 'vulnerabilities')
+        statistical_results: dict of statistical results (e.g., 'significance', 'confidence_intervals')
+        config: experiment config dict
+        output_path: path to write the report (Markdown or .txt)
+    """
+    import datetime
+    lines = []
+    # --- Methodology ---
+    lines.append('# Experiment Methodology\n')
+    lines.append(f"**Date:** {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    lines.append(f"**Models:** {', '.join(str(m) for m in config.get('models', []))}")
+    lines.append(f"**Boundaries:** {', '.join(str(b) for b in config.get('boundaries', []))}")
+    lines.append(f"**Attack Types:** {', '.join(str(a) for a in config.get('attack_types', []))}")
+    lines.append(f"**Num Attacks per Combo:** {config.get('num_attacks', 'N/A')}")
+    lines.append(f"**Batch Size:** {config.get('batch_size', 'N/A')}")
+    lines.append(f"**Random Seed:** {config.get('seed', 'N/A')}")
+    lines.append('\n---\n')
+    # --- Results ---
+    lines.append('# Results\n')
+    # Attack Success Table
+    if 'attack_success' in metrics:
+        lines.append('## Attack Success Rates by Boundary and Attack Type\n')
+        lines.append(metrics['attack_success'].to_markdown(index=True))
+        lines.append('')
+    # Cross-Modal Table
+    if 'cross_modal' in metrics:
+        lines.append('## Cross-Modal Transfer Effectiveness\n')
+        for boundary, matrix in metrics['cross_modal'].items():
+            lines.append(f'### Boundary: {boundary}')
+            lines.append(matrix.to_markdown(index=True))
+            lines.append('')
+    # Model Vulnerabilities
+    if 'vulnerabilities' in metrics:
+        lines.append('## Top Model Vulnerabilities\n')
+        lines.append(metrics['vulnerabilities'].to_markdown(index=False))
+        lines.append('')
+    # --- Statistical Results ---
+    lines.append('# Statistical Analysis\n')
+    if 'significance' in statistical_results:
+        lines.append('## Boundary Significance Tests (p-values)\n')
+        lines.append(statistical_results['significance'].to_markdown(index=False))
+        lines.append('')
+    if 'confidence_intervals' in statistical_results:
+        lines.append('## Confidence Intervals for Success Rates\n')
+        lines.append(statistical_results['confidence_intervals'].to_markdown(index=False))
+        lines.append('')
+    # --- Key Insights ---
+    lines.append('# Key Insights\n')
+    # Best and worst boundaries
+    if 'attack_success' in metrics:
+        attack_success = metrics['attack_success']
+        best = attack_success.min().min()
+        worst = attack_success.max().max()
+        lines.append(f"- **Best boundary/attack combo:** {attack_success.stack().idxmin()} ({best:.1f}% success)")
+        lines.append(f"- **Worst boundary/attack combo:** {attack_success.stack().idxmax()} ({worst:.1f}% success)")
+    # Most vulnerable model
+    if 'vulnerabilities' in metrics:
+        top_vuln = metrics['vulnerabilities'].iloc[0]
+        lines.append(f"- **Most vulnerable model:** {top_vuln['model']} (Attack: {top_vuln['attack_type']}, Boundary: {top_vuln['boundary']}, Success Rate: {top_vuln['success_rate']:.1f}%)")
+    lines.append('\n---\n')
+    # Write to file
+    with open(output_path, 'w') as f:
+        f.write('\n'.join(lines))
