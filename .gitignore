@@ -1,4 +1,5 @@
-# .gitignore
+# .gitignore for MMCB Project
+
 # Python
 __pycache__/
 *.py[cod]
@@ -25,21 +26,59 @@ var/
 venv/
 ENV/
 env/
+.venv/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+*.ipynb_checkpoints/
 
-# Project-specific
+# Project-specific directories
 logs/
 data/results/
-data/structured/  # Generated structured data files
-data/code/        # Generated code files
+data/checkpoints/  # Add this - your checkpoints directory
+data/reports/      # Add this - your reports directory
+
+# Generated attack files (keep structure, ignore content)
+data/generated/structured/*.json
+data/generated/structured/*.csv
+data/generated/structured/*.yaml
+data/generated/structured/*.xml
+data/generated/code/*.py
+data/generated/code/*.js
+data/generated/advanced/*
+# But keep the test.txt placeholders and example files
+!data/generated/*/test.txt
+!data/generated/structured/injected.*
+!data/generated/code/comment_injection.py
+!data/generated/code/tmp_benign_code.txt
+
+# Model cache and weights
+~/models/huggingface/
+*.pt
+*.bin
+*.safetensors
+*.gguf
+*.ggml
+
+# Experiment outputs
+experiment_*/
+run_*/
+last_cli_command.txt  # Add this - your CLI command tracking
+
+# Temporary and log files
+*.tmp
+*.temp
+*.bak
+*.log
+*.jsonl
 
 # Editor files
 .idea/
 .vscode/
 *.swp
 *.swo
+.spyderproject
+.spyproject
 
 # OS specific
 .DS_Store
@@ -50,19 +89,42 @@ data/code/        # Generated code files
 ehthumbs.db
 Thumbs.db
 
-# Model files (these can be quite large)
-*.pt
-*.bin
-*.safetensors
-
-# Experimental data
-experiment_*/
-
-# Temporary files
-*.tmp
-*.temp
-*.bak
-
 # Config files that might contain sensitive information
 *_local.yaml
 *_secret.yaml
+*_private.yaml
+
+# Testing and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Documentation builds
+docs/_build/
+docs/site/
+
+# Environment variables
+.env
+.env.local
+
+# HuggingFace cache (if stored locally)
+.cache/huggingface/
+
+# Weights & Biases (if used)
+wandb/
+
+# MLflow (if used)
+mlruns/
+
+# Large data files that shouldn't be in git
+*.h5
+*.hdf5
+*.parquet
+*.pkl
+*.pickle
+
+# Backup files
+*~
+*.bak
+*.orig
