@@ -35,8 +35,8 @@ env/
 # Project-specific directories
 logs/
 data/results/
-data/checkpoints/  # Add this - your checkpoints directory
-data/reports/      # Add this - your reports directory
+data/checkpoints/
+data/reports/
 
 # Generated attack files (keep structure, ignore content)
 data/generated/structured/*.json
@@ -63,7 +63,7 @@ data/generated/advanced/*
 # Experiment outputs
 experiment_*/
 run_*/
-last_cli_command.txt  # Add this - your CLI command tracking
+last_cli_command.txt
 
 # Temporary and log files
 *.tmp
