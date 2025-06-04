@@ -1,5 +1,7 @@
 # Multi-Modal Context Boundaries: Defending Against Structured Data and Code Injection Attacks
 
+![Status](https://img.shields.io/badge/Status-In_Progress-yellow)
+
 A quarter-long research project for [CSE227](https://plsyssec.github.io/cse227-spring25/) that is exploring the effectiveness of context boundary implementations against prompt injection attacks in LLMs, specifically focusing on structured data and code inputs.
 
 ## Overview
