@@ -26,10 +26,7 @@ import time
 import glob
 from collections import deque
 
-from boundaries.token_boundary import TokenBoundary
-from boundaries.semantic_boundary import SemanticBoundary
-from boundaries.hybrid_boundary import HybridBoundary
-
+from boundaries import BoundaryFactory
 from attacks.generator import FileBasedAttackGenerator
 from utils.logging import setup_logger
 from utils.metrics import (
@@ -50,6 +47,7 @@ from utils.metrics import (
     create_model_comparison_visualization
 )
 from utils.visualization import generate_summary_chart
+from utils.config import ExperimentConfig
 
 try:
     import psutil
@@ -141,7 +139,7 @@ def load_and_validate_config(config_path):
         base_config = load_and_validate_config(base_path)
         config = merge_dicts(base_config, config)
         del config['extends']
-    # Validate required fields and types
+    # Validate required fields and types (legacy)
     errors = []
     for key, meta in CONFIG_SCHEMA.items():
         if meta.get('required') and key not in config:
@@ -193,6 +191,11 @@ def load_and_validate_config(config_path):
             errors.append(f"Config field '{k}' must be a positive integer.")
     # Experiment-level settings (optional, can add more checks)
     # ...
+    # Pydantic validation layer
+    try:
+        ExperimentConfig(**config)
+    except Exception as e:
+        raise ConfigValidationError(f"Pydantic validation failed: {e}")
     if errors:
         msg = '\n'.join(errors)
         raise ConfigValidationError(f"Experiment configuration validation failed:\n{msg}")
@@ -485,6 +488,7 @@ class ExperimentRunner:
             experiments = []
             for model in self.config['models']:
                 for boundary in self.config['boundaries']:
+                    boundary_mechanism = BoundaryFactory.create_boundary(boundary)
                     for attack_type in attack_types:
                         if attack_type not in SUPPORTED_ATTACK_TYPES:
                             continue
@@ -492,6 +496,7 @@ class ExperimentRunner:
                             experiments.append({
                                 'model': model,
                                 'boundary': boundary,
+                                'boundary_mechanism': boundary_mechanism,
                                 'attack_type': attack_type,
                                 'attack_index': i
                             })
@@ -583,6 +588,7 @@ class ExperimentRunner:
             single_start = time.time()
             model = exp['model']
             boundary = exp['boundary']
+            boundary_mechanism = exp['boundary_mechanism']
             attack_type = exp['attack_type']
             attack_index = exp['attack_index']
             # --- Performance Monitoring ---
@@ -614,6 +620,7 @@ class ExperimentRunner:
             metadata = {
                 'model': model,
                 'boundary': boundary,
+                'boundary_mechanism': boundary_mechanism,
                 'attack_type': attack_type,
                 'attack_index': attack_index,
                 'file_path': attack_path,
