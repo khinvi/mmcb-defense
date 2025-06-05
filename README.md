@@ -24,7 +24,7 @@ In this repository, I am sharing the systematic approach I took to understand, e
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/mmcb-defense.git
+git clone https://github.com/khinvi/mmcb-defense.git
 cd mmcb-defense
 
 # Create a virtual environment
