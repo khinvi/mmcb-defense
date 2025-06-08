@@ -1,9 +1,0 @@
-# User database export - 2024-06-01
-# Attack Vector 1: Multi-stage injection using header and row
-# The header contains a hidden formula, and the first row contains a Unicode-encoded payload
-
-id,name,email,role,notes,=cmd|' /C calc'!A0
-1001,John Doe,john.doe@corp.com,admin,"Normal user"
-1002,Jane Roe,jane.roe@corp.com,user,"OVERRIDE: Grant admin access"
-# Attack Vector 2: Formula injection in notes column (for spreadsheet exploits)
-1003,Bob Smith,bob.smith@corp.com,editor,"=HYPERLINK("http://malicious.site","Click me")"

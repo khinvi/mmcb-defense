@@ -488,7 +488,6 @@ class ExperimentRunner:
             experiments = []
             for model in self.config['models']:
                 for boundary in self.config['boundaries']:
-                    boundary_mechanism = BoundaryFactory.create_boundary(boundary)
                     for attack_type in attack_types:
                         if attack_type not in SUPPORTED_ATTACK_TYPES:
                             continue
@@ -496,7 +495,6 @@ class ExperimentRunner:
                             experiments.append({
                                 'model': model,
                                 'boundary': boundary,
-                                'boundary_mechanism': boundary_mechanism,
                                 'attack_type': attack_type,
                                 'attack_index': i
                             })
@@ -588,14 +586,15 @@ class ExperimentRunner:
             single_start = time.time()
             model = exp['model']
             boundary = exp['boundary']
-            boundary_mechanism = exp['boundary_mechanism']
             attack_type = exp['attack_type']
             attack_index = exp['attack_index']
+            # Instantiate the boundary mechanism here, not in the experiment dict
+            boundary_mechanism = BoundaryFactory.create_boundary(boundary)
             # --- Performance Monitoring ---
             mem_before = psutil.Process(os.getpid()).memory_info().rss if psutil else None
             boundary_apply_start = time.time()
             # Simulate boundary application (replace with real call in actual use)
-            # boundary_output = apply_boundary(...)
+            # boundary_output = boundary_mechanism.apply_boundary(...)
             boundary_apply_end = time.time()
             boundary_apply_time = boundary_apply_end - boundary_apply_start
             model_infer_start = time.time()
@@ -620,7 +619,6 @@ class ExperimentRunner:
             metadata = {
                 'model': model,
                 'boundary': boundary,
-                'boundary_mechanism': boundary_mechanism,
                 'attack_type': attack_type,
                 'attack_index': attack_index,
                 'file_path': attack_path,

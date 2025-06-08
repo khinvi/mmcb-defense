@@ -1,5 +1,5 @@
 from typing import List, Dict, Optional, Any, Union
-from pydantic import BaseModel, validator, root_validator, Field
+from pydantic import BaseModel, validator, root_validator, Field, field_validator
 
 SUPPORTED_MODELS = [
     'llama3-8b', 'mistral-7b', 'Llama-3-8B', 'Mistral-7B',
@@ -60,15 +60,15 @@ class ExperimentConfig(BaseModel):
             raise ValueError(f"Attack type '{v}' not supported. Supported: {SUPPORTED_ATTACK_TYPES}")
         return v
 
-    @validator('num_attacks', 'batch_size', 'checkpoint_interval')
-    def positive_int(cls, v, field):
+    @field_validator('num_attacks', 'batch_size', 'checkpoint_interval')
+    def positive_int(cls, v):
         if not isinstance(v, int) or v <= 0:
-            raise ValueError(f"{field.name} must be a positive integer.")
+            raise ValueError("Value must be a positive integer.")
         return v
 
     class Config:
         extra = 'allow'  # Allow extra fields for forward compatibility
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "models": ["llama3-8b", {"name": "mistral-7b", "device": "cuda"}],
                 "boundaries": ["token", "semantic"],
