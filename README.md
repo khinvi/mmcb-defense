@@ -52,8 +52,6 @@ mmcb-defense/
 
 ## Usage
 
-## Usage
-
 ### Running Experiments
 
 ```bash
