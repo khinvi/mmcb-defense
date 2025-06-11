@@ -263,48 +263,8 @@ python -m pytest tests/test_attacks.py -v
 python -m pytest tests/test_mmcb_integration.py -v
 ```
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## Citation
-
-If you use this code in your research, please cite my work:
-
-```bibtex
-@misc{mmcb-defense,
-  author = {Arnav Khinvasara},
-  title = {Multi-Modal Context Boundaries: Defending Against Structured Data and Code Injection Attacks},
-  year = {2024},
-  publisher = {GitHub},
-  journal = {GitHub repository},
-  howpublished = {\url{https://github.com/khinvi/mmcb-defense}}
-}
-```
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## Acknowledgments
 
 - **[Professor Deian Stefan](https://cseweb.ucsd.edu/~dstefan/)** - Course instructor and research advisor
 - **LLM Usage**: Claude 4.0 Opus, Claude 4.0 Sonnet, Claude 3.7 Sonnet, Gemini 2.5 Flash for development assistance
 - **UC San Diego CSE 227** - Computer Security course framework
-
-## Status and Future Work
-
-This project is actively developed as part of a quarter-long research initiative. Future directions include:
-
-- Extended evaluation across additional open-source models
-- Development of adaptive boundary mechanisms
-- Real-world deployment case studies
-- Integration with existing LLM safety frameworks
-
----
-
-**📧 Contact**: For questions about this research, please reach out through the course or repository issues.
