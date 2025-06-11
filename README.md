@@ -88,7 +88,7 @@ python src/main.py --config config/custom_experiment.yaml --quick
 
 ### Analyzing Results
 
-In order to portray the experiment results effectively, I created a Jupyter notebook that can be accessed by:
+Visualize the data with the Jupyter Notebook I created; use these instructions to set it up:
 
 ```bash
 # Start Jupyter notebook
@@ -97,9 +97,9 @@ jupyter notebook notebooks/analysis.ipynb
 
 ## Boundary Mechanisms
 
-1. **Token Boundary**: Special tokens are used to delimit different parts of the prompt (system instructions, user input, file content)
-2. **Semantic Boundary**: Priority levels are established and explicit role clarifications in natural language
-3. **Hybrid Boundary**: Both token and semantic approaches are combined for enhanced protection
+1. **Token Boundary**: Special tokens as delimiters fir different parts of the prompt (system instructions, user input, file content)
+2. **Semantic Boundary**: Priority levels + explicit role clarifications in natural language
+3. **Hybrid Boundary**: Token + semantic approaches
 
 ## Attack Vectors Used
 
@@ -108,7 +108,7 @@ jupyter notebook notebooks/analysis.ipynb
 
 ## Citation
 
-If you use this code in your research, please cite our work:
+If you use this code in your research, please cite my work:
 
 ```
 @misc{mmcb-defense,
