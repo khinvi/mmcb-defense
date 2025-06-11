@@ -16,8 +16,8 @@ In this repository, I am sharing the systematic approach I took to understand, e
 
 - **Boundary Mechanisms**: Implementation of token-based, semantic-based, and hybrid boundary approaches
 - **File-Based Attack Vectors**: JSON, CSV, YAML, XML files, code snippets
-- **Model Comparison**: Evaluation across multiple open-source LLMs (Llama 3 8B, Mistral 7B)
-- **Analysis**: Metrics for attack success rates, cross-modal transfer effectiveness, and implementation complexity
+- **Model Comparison**: Evaluation between Llama 3 8B, Mistral 7B (Most commonly used open-source models)
+- **Analysis**: Attack Success Rates, Cross-modal Transfer Effectiveness, Implementation Complexity
 
 ## Installation
 
