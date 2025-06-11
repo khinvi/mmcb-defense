@@ -7,10 +7,10 @@ A quarter-long research project for [CSE227](https://plsyssec.github.io/cse227-s
 
 In this repository, I am sharing the systematic approach I took to understand, evaluate, and compare the different context boundary mechanisms in protecting LLMs against these multi-modal prompt injection attack types and took the scope of my research through four key questions:
 
-1. Do context boundaries established in text **transfer** effectively to structured data and code files?
-2. Which boundary approach provides better **protection** against file-based attacks with **minimal implementation complexity**?
-3. Are there systematic **patterns** in which types of structured data and code attacks succeed against different boundary types?
-4. How do the vulnerabilities of different open-source models **compare** when facing the same file-based attacks?
+1. Do textual context boundaries methods work with the structured data and code files too? 
+2. Which specific boundary implementations provide protection against file-based attacks but also respects minimal implementation complexity and to what extent?
+3. Are there noticeable systematic patterns where certain types of structured data as well as code attacks are more successful than other boundary types? 
+4. Even when facing the same types of attacks, how do different open-source models compare and contrast?
 
 ## Key Features
 
