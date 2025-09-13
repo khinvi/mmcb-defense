@@ -1,6 +1,6 @@
 # Multi-Modal Context Boundaries Defense: Evaluation of Defense Mechanisms Against Structured Data and Code Injection Attacks in Open-Source Large Language Models
 
-![Status](https://img.shields.io/badge/Status-In_Progress-yellow)
+![Status](https://img.shields.io/badge/Status-Completed-Green)
 ![Python](https://img.shields.io/badge/Python-3.8+-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
